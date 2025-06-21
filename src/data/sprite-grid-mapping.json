@@ -1,0 +1,1200 @@
+{
+  "metadata": {
+    "generatedAt": "2025-06-21T04:41:08.010Z",
+    "description": "Sprite sheet grid mapping for character creation assets",
+    "baseSize": 32
+  },
+  "categories": {
+    "characters": {
+      "assets": {
+        "char1.png": {
+          "filename": "char1.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char1.png"
+        },
+        "char2.png": {
+          "filename": "char2.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char2.png"
+        },
+        "char3.png": {
+          "filename": "char3.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char3.png"
+        },
+        "char4.png": {
+          "filename": "char4.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char4.png"
+        },
+        "char5.png": {
+          "filename": "char5.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char5.png"
+        },
+        "char6.png": {
+          "filename": "char6.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char6.png"
+        },
+        "char7.png": {
+          "filename": "char7.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char7.png"
+        },
+        "char8.png": {
+          "filename": "char8.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char8.png"
+        },
+        "char_all.png": {
+          "filename": "char_all.png",
+          "dimensions": {
+            "width": 2048,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 64,
+            "rows": 49,
+            "total": 3136,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "64x49 grid (3136 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/characters/char_all.png"
+        }
+      },
+      "summary": {
+        "totalAssets": 9,
+        "gridPatterns": {
+          "8x49": {
+            "count": 8,
+            "description": "8x49 grid (392 variations)",
+            "examples": [
+              "char1.png",
+              "char2.png",
+              "char3.png"
+            ]
+          },
+          "64x49": {
+            "count": 1,
+            "description": "64x49 grid (3136 variations)",
+            "examples": [
+              "char_all.png"
+            ]
+          }
+        },
+        "averageDimensions": {
+          "width": 455,
+          "height": 1568
+        }
+      }
+    },
+    "eyes": {
+      "assets": {
+        "blush_all.png": {
+          "filename": "blush_all.png",
+          "dimensions": {
+            "width": 1280,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 40,
+            "rows": 49,
+            "total": 1960,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "40x49 grid (1960 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/eyes/blush_all.png"
+        },
+        "eyes.png": {
+          "filename": "eyes.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/eyes/eyes.png"
+        },
+        "lipstick .png": {
+          "filename": "lipstick .png",
+          "dimensions": {
+            "width": 1280,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 40,
+            "rows": 49,
+            "total": 1960,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "40x49 grid (1960 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/eyes/lipstick .png"
+        }
+      },
+      "summary": {
+        "totalAssets": 3,
+        "gridPatterns": {
+          "40x49": {
+            "count": 2,
+            "description": "40x49 grid (1960 variations)",
+            "examples": [
+              "blush_all.png",
+              "lipstick .png"
+            ]
+          },
+          "112x49": {
+            "count": 1,
+            "description": "112x49 grid (5488 variations)",
+            "examples": [
+              "eyes.png"
+            ]
+          }
+        },
+        "averageDimensions": {
+          "width": 2048,
+          "height": 1568
+        }
+      }
+    },
+    "clothes": {
+      "assets": {
+        "basic.png": {
+          "filename": "basic.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/basic.png"
+        },
+        "clown.png": {
+          "filename": "clown.png",
+          "dimensions": {
+            "width": 512,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 16,
+            "rows": 49,
+            "total": 784,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "16x49 grid (784 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/clown.png"
+        },
+        "dress .png": {
+          "filename": "dress .png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/dress .png"
+        },
+        "floral.png": {
+          "filename": "floral.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/floral.png"
+        },
+        "overalls.png": {
+          "filename": "overalls.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/overalls.png"
+        },
+        "pants.png": {
+          "filename": "pants.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/pants.png"
+        },
+        "pants_suit.png": {
+          "filename": "pants_suit.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/pants_suit.png"
+        },
+        "pumpkin.png": {
+          "filename": "pumpkin.png",
+          "dimensions": {
+            "width": 512,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 16,
+            "rows": 49,
+            "total": 784,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "16x49 grid (784 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/pumpkin.png"
+        },
+        "sailor.png": {
+          "filename": "sailor.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/sailor.png"
+        },
+        "sailor_bow.png": {
+          "filename": "sailor_bow.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/sailor_bow.png"
+        },
+        "shoes.png": {
+          "filename": "shoes.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/shoes.png"
+        },
+        "skirt.png": {
+          "filename": "skirt.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/skirt.png"
+        },
+        "skull.png": {
+          "filename": "skull.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/skull.png"
+        },
+        "spaghetti.png": {
+          "filename": "spaghetti.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/spaghetti.png"
+        },
+        "spooky .png": {
+          "filename": "spooky .png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/spooky .png"
+        },
+        "sporty.png": {
+          "filename": "sporty.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/sporty.png"
+        },
+        "stripe.png": {
+          "filename": "stripe.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/stripe.png"
+        },
+        "suit.png": {
+          "filename": "suit.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/suit.png"
+        },
+        "witch.png": {
+          "filename": "witch.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/clothes/witch.png"
+        }
+      },
+      "summary": {
+        "totalAssets": 19,
+        "gridPatterns": {
+          "80x49": {
+            "count": 15,
+            "description": "80x49 grid (3920 variations)",
+            "examples": [
+              "basic.png",
+              "dress .png",
+              "floral.png"
+            ]
+          },
+          "16x49": {
+            "count": 2,
+            "description": "16x49 grid (784 variations)",
+            "examples": [
+              "clown.png",
+              "pumpkin.png"
+            ]
+          },
+          "8x49": {
+            "count": 2,
+            "description": "8x49 grid (392 variations)",
+            "examples": [
+              "spooky .png",
+              "witch.png"
+            ]
+          }
+        },
+        "averageDimensions": {
+          "width": 2102,
+          "height": 1568
+        }
+      }
+    },
+    "hair": {
+      "assets": {
+        "bob .png": {
+          "filename": "bob .png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/bob .png"
+        },
+        "braids.png": {
+          "filename": "braids.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/braids.png"
+        },
+        "buzzcut.png": {
+          "filename": "buzzcut.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/buzzcut.png"
+        },
+        "curly.png": {
+          "filename": "curly.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/curly.png"
+        },
+        "emo.png": {
+          "filename": "emo.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/emo.png"
+        },
+        "extra_long.png": {
+          "filename": "extra_long.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/extra_long.png"
+        },
+        "extra_long_skirt.png": {
+          "filename": "extra_long_skirt.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/extra_long_skirt.png"
+        },
+        "french_curl.png": {
+          "filename": "french_curl.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/french_curl.png"
+        },
+        "gentleman.png": {
+          "filename": "gentleman.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/gentleman.png"
+        },
+        "long_straight .png": {
+          "filename": "long_straight .png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/long_straight .png"
+        },
+        "long_straight_skirt.png": {
+          "filename": "long_straight_skirt.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/long_straight_skirt.png"
+        },
+        "midiwave.png": {
+          "filename": "midiwave.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/midiwave.png"
+        },
+        "ponytail .png": {
+          "filename": "ponytail .png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/ponytail .png"
+        },
+        "spacebuns.png": {
+          "filename": "spacebuns.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/spacebuns.png"
+        },
+        "wavy.png": {
+          "filename": "wavy.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/hair/wavy.png"
+        }
+      },
+      "summary": {
+        "totalAssets": 15,
+        "gridPatterns": {
+          "112x49": {
+            "count": 15,
+            "description": "112x49 grid (5488 variations)",
+            "examples": [
+              "bob .png",
+              "braids.png",
+              "buzzcut.png"
+            ]
+          }
+        },
+        "averageDimensions": {
+          "width": 3584,
+          "height": 1568
+        }
+      }
+    },
+    "acc": {
+      "assets": {
+        "beard.png": {
+          "filename": "beard.png",
+          "dimensions": {
+            "width": 3584,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 112,
+            "rows": 49,
+            "total": 5488,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "112x49 grid (5488 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/beard.png"
+        },
+        "earring_emerald.png": {
+          "filename": "earring_emerald.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/earring_emerald.png"
+        },
+        "earring_emerald_silver.png": {
+          "filename": "earring_emerald_silver.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/earring_emerald_silver.png"
+        },
+        "earring_red.png": {
+          "filename": "earring_red.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/earring_red.png"
+        },
+        "earring_red_silver.png": {
+          "filename": "earring_red_silver.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/earring_red_silver.png"
+        },
+        "glasses.png": {
+          "filename": "glasses.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/glasses.png"
+        },
+        "glasses_sun.png": {
+          "filename": "glasses_sun.png",
+          "dimensions": {
+            "width": 2560,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 80,
+            "rows": 49,
+            "total": 3920,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "80x49 grid (3920 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/glasses_sun.png"
+        },
+        "hat_cowboy.png": {
+          "filename": "hat_cowboy.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/hat_cowboy.png"
+        },
+        "hat_lucky.png": {
+          "filename": "hat_lucky.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/hat_lucky.png"
+        },
+        "hat_pumpkin.png": {
+          "filename": "hat_pumpkin.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/hat_pumpkin.png"
+        },
+        "hat_pumpkin_purple.png": {
+          "filename": "hat_pumpkin_purple.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/hat_pumpkin_purple.png"
+        },
+        "hat_witch.png": {
+          "filename": "hat_witch.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/hat_witch.png"
+        },
+        "mask_clown_blue.png": {
+          "filename": "mask_clown_blue.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/mask_clown_blue.png"
+        },
+        "mask_clown_red.png": {
+          "filename": "mask_clown_red.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/mask_clown_red.png"
+        },
+        "mask_spooky.png": {
+          "filename": "mask_spooky.png",
+          "dimensions": {
+            "width": 256,
+            "height": 1568
+          },
+          "grid": {
+            "cols": 8,
+            "rows": 49,
+            "total": 392,
+            "cellWidth": 32,
+            "cellHeight": 32,
+            "description": "8x49 grid (392 variations)",
+            "confidence": "estimated"
+          },
+          "path": "/assets/acc/mask_spooky.png"
+        }
+      },
+      "summary": {
+        "totalAssets": 15,
+        "gridPatterns": {
+          "112x49": {
+            "count": 1,
+            "description": "112x49 grid (5488 variations)",
+            "examples": [
+              "beard.png"
+            ]
+          },
+          "8x49": {
+            "count": 12,
+            "description": "8x49 grid (392 variations)",
+            "examples": [
+              "earring_emerald.png",
+              "earring_emerald_silver.png",
+              "earring_red.png"
+            ]
+          },
+          "80x49": {
+            "count": 2,
+            "description": "80x49 grid (3920 variations)",
+            "examples": [
+              "glasses.png",
+              "glasses_sun.png"
+            ]
+          }
+        },
+        "averageDimensions": {
+          "width": 785,
+          "height": 1568
+        }
+      }
+    }
+  }
+}

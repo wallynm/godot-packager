@@ -1,0 +1,49 @@
+export type SpriteGridInfo = {
+  cols: number
+  rows: number
+  total: number
+  cellWidth: number
+  cellHeight: number
+  description: string
+  confidence: 'high' | 'estimated'
+}
+
+export type SpriteDimensions = {
+  width: number
+  height: number
+}
+
+export type SpriteAssetInfo = {
+  filename: string
+  dimensions: SpriteDimensions
+  grid: SpriteGridInfo
+  path: string
+}
+
+export type SpriteCategory = 'characters' | 'eyes' | 'clothes' | 'hair' | 'acc'
+
+export type SpriteSelection = {
+  category: SpriteCategory
+  filename: string
+  colorVariation: number // Column index (0-based)
+  animationFrame: number // Row index (0-based, default to 0 for idle)
+}
+
+export type SelectedSpriteLayers = {
+  characters: SpriteSelection | null
+  eyes: SpriteSelection | null
+  clothes: SpriteSelection | null
+  hair: SpriteSelection | null
+  acc: SpriteSelection | null
+}
+
+export type ColorVariation = {
+  index: number
+  name: string
+  description?: string
+}
+
+export type SpriteAssetWithVariations = SpriteAssetInfo & {
+  colorVariations: ColorVariation[]
+  defaultFrame: number // Default animation frame to use for character creation
+} 
