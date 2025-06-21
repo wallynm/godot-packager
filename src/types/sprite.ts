@@ -63,12 +63,17 @@ export type UploadedLayer = {
   position: LayerPosition
   opacity: number
   visible: boolean
-  isBase?: boolean // True for the character base layer
+}
+
+export type ExportConfig = {
+  width: number
+  height: number
+  name: string
 }
 
 export type LayerStack = {
-  baseLayer: UploadedLayer | null
-  additionalLayers: UploadedLayer[]
+  layers: UploadedLayer[]
+  exportConfig: ExportConfig
 }
 
 export type DragState = {

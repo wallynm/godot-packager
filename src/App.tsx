@@ -124,18 +124,6 @@ const App = () => {
               />
             </div>
 
-            {/* Layer Management */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <LayerManagement
-                baseLayer={baseLayer}
-                additionalLayers={additionalLayers}
-                selectedLayerId={selectedLayerId}
-                onLayerUpdate={handleLayerUpdate}
-                onLayerDelete={handleLayerDelete}
-                onLayerReorder={handleLayerReorder}
-              />
-            </div>
-
             {/* Export Panel */}
             <div className="bg-white rounded-lg shadow-lg p-6">
               <UploadExportPanel
@@ -145,6 +133,16 @@ const App = () => {
             </div>
           </div>
         </div>
+
+        {/* Floating Layer Management Panel */}
+        <LayerManagement
+          baseLayer={baseLayer}
+          additionalLayers={additionalLayers}
+          selectedLayerId={selectedLayerId}
+          onLayerUpdate={handleLayerUpdate}
+          onLayerDelete={handleLayerDelete}
+          onLayerReorder={handleLayerReorder}
+        />
       </div>
     </div>
   )

@@ -1,5 +1,4 @@
 import { useCallback, useState } from 'react'
-import { tv } from 'tailwind-variants'
 import type { UploadedLayer } from '../types/sprite'
 
 type LayerManagementProps = {
@@ -11,34 +10,44 @@ type LayerManagementProps = {
   onLayerReorder: (layerId: string, direction: 'up' | 'down') => void
 }
 
-const layerItem = tv({
-  base: 'p-3 border border-gray-200 rounded-lg transition-all duration-200',
-  variants: {
-    selected: {
-      true: 'border-blue-500 bg-blue-50',
-      false: 'hover:border-gray-300 hover:bg-gray-50'
-    },
-    isBase: {
-      true: 'border-green-300 bg-green-50',
-      false: ''
-    }
-  }
-})
 
-const controlButton = tv({
-  base: 'p-1 rounded text-xs transition-all duration-200',
-  variants: {
-    variant: {
-      primary: 'bg-blue-100 text-blue-700 hover:bg-blue-200',
-      danger: 'bg-red-100 text-red-700 hover:bg-red-200',
-      secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-    },
-    disabled: {
-      true: 'opacity-50 cursor-not-allowed',
-      false: 'cursor-pointer'
-    }
-  }
-})
+
+type LayerPreviewModalProps = {
+  layer: UploadedLayer
+  onClose: () => void
+}
+
+const LayerPreviewModal = ({ layer, onClose }: LayerPreviewModalProps) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-white rounded-lg p-6 max-w-2xl max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold">{layer.name}</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+        <div className="text-center">
+          <img
+            src={layer.imageData}
+            alt={layer.name}
+            className="max-w-full max-h-96 mx-auto"
+            style={{ imageRendering: 'pixelated' }}
+          />
+          <div className="mt-4 text-sm text-gray-600 space-y-1">
+            <p>Dimensions: {layer.dimensions.width} × {layer.dimensions.height}px</p>
+            <p>Position: ({layer.position.x}, {layer.position.y})</p>
+            <p>Z-Index: {layer.position.zIndex}</p>
+            <p>Opacity: {Math.round(layer.opacity * 100)}%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export const LayerManagement = ({
   baseLayer,
@@ -48,19 +57,13 @@ export const LayerManagement = ({
   onLayerDelete,
   onLayerReorder
 }: LayerManagementProps) => {
+  const [previewLayer, setPreviewLayer] = useState<UploadedLayer | null>(null)
+  
   const allLayers = baseLayer ? [baseLayer, ...additionalLayers] : additionalLayers
   const sortedLayers = [...allLayers].sort((a, b) => b.position.zIndex - a.position.zIndex)
 
-  const handleOpacityChange = useCallback((layerId: string, opacity: number) => {
-    onLayerUpdate(layerId, { opacity })
-  }, [onLayerUpdate])
-
   const handleVisibilityToggle = useCallback((layerId: string, visible: boolean) => {
     onLayerUpdate(layerId, { visible })
-  }, [onLayerUpdate])
-
-  const handleNameChange = useCallback((layerId: string, name: string) => {
-    onLayerUpdate(layerId, { name })
   }, [onLayerUpdate])
 
   const getLayerIndex = (layerId: string) => {
@@ -77,132 +80,160 @@ export const LayerManagement = ({
     return index < sortedLayers.length - 1 && !sortedLayers[index].isBase
   }
 
+  // Show panel when there are layers, or always show for now to test
+  if (allLayers.length === 0) {
+    // For testing - always show the panel
+    // return null
+  }
+
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800">Layer Management</h3>
-      
-      {allLayers.length === 0 ? (
-        <p className="text-sm text-gray-500">No layers uploaded yet</p>
-      ) : (
+    <>
+      <div className="fixed top-4 right-4 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-40 min-w-[200px]">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-gray-800">Layers ({allLayers.length})</h3>
+          <div className="text-xs text-gray-500">Top to Bottom</div>
+        </div>
+        
         <div className="space-y-2">
-          {sortedLayers.map((layer) => (
+          {allLayers.length === 0 ? (
+            <div className="text-xs text-gray-500 text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="mb-2">📁</div>
+              <div>No layers uploaded yet</div>
+              <div className="text-xs mt-1">Upload a base layer to start</div>
+            </div>
+          ) : (
+            sortedLayers.map((layer) => (
             <div
               key={layer.id}
-              className={layerItem({ 
-                selected: selectedLayerId === layer.id, 
-                isBase: layer.isBase 
-              })}
+              className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50"
             >
-              <div className="space-y-3">
-                {/* Layer Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-white border border-gray-300 rounded overflow-hidden">
-                      <img
-                        src={layer.imageData}
-                        alt={layer.name}
-                        className="w-full h-full object-contain"
-                        style={{ imageRendering: 'pixelated' }}
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      value={layer.name}
-                      onChange={(e) => handleNameChange(layer.id, e.target.value)}
-                      className="text-sm font-medium bg-transparent border-none outline-none focus:bg-white focus:border focus:border-gray-300 focus:rounded px-1"
-                      disabled={layer.isBase}
-                    />
-                    {layer.isBase && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                        BASE
-                      </span>
-                    )}
-                  </div>
-                  
-                  {!layer.isBase && (
-                    <div className="flex items-center space-x-1">
-                      <button
-                        onClick={() => onLayerReorder(layer.id, 'up')}
-                        className={controlButton({ 
-                          variant: 'secondary', 
-                          disabled: !canMoveUp(layer.id) 
-                        })}
-                        disabled={!canMoveUp(layer.id)}
-                        title="Move up"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() => onLayerReorder(layer.id, 'down')}
-                        className={controlButton({ 
-                          variant: 'secondary', 
-                          disabled: !canMoveDown(layer.id) 
-                        })}
-                        disabled={!canMoveDown(layer.id)}
-                        title="Move down"
-                      >
-                        ↓
-                      </button>
-                      <button
-                        onClick={() => onLayerDelete(layer.id)}
-                        className={controlButton({ variant: 'danger' })}
-                        title="Delete layer"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
+              {/* Layer Thumbnail */}
+              <div className={`w-12 h-12 border-2 rounded-lg cursor-pointer transition-all duration-200 relative group ${
+                selectedLayerId === layer.id 
+                  ? 'border-blue-500 ring-2 ring-blue-200' 
+                  : layer.isBase 
+                    ? 'border-green-500 ring-2 ring-green-200'
+                    : 'border-gray-300 hover:border-gray-400'
+              }`}>
+                <img
+                  src={layer.imageData}
+                  alt={layer.name}
+                  className="w-full h-full object-contain rounded"
+                  style={{ imageRendering: 'pixelated' }}
+                />
+                
+                {/* Visibility indicator */}
+                <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-white border">
+                  <div 
+                    className={`w-full h-full rounded-full ${
+                      layer.visible ? 'bg-green-500' : 'bg-gray-400'
+                    }`}
+                  />
                 </div>
 
-                {/* Layer Controls */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="space-y-1">
-                    <label className="text-gray-600">Opacity</label>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={layer.opacity}
-                        onChange={(e) => handleOpacityChange(layer.id, parseFloat(e.target.value))}
-                        className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                      />
-                      <span className="w-8 text-right">{Math.round(layer.opacity * 100)}%</span>
-                    </div>
+                {/* Base layer indicator */}
+                {layer.isBase && (
+                  <div className="absolute -bottom-1 -left-1 w-4 h-3 bg-green-500 text-white text-xs flex items-center justify-center rounded text-[8px] font-bold">
+                    B
                   </div>
-                  
-                  <div className="space-y-1">
-                    <label className="text-gray-600">Visibility</label>
-                    <button
-                      onClick={() => handleVisibilityToggle(layer.id, !layer.visible)}
-                      className={`w-full py-1 px-2 rounded text-xs font-medium transition-all duration-200 ${
-                        layer.visible
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                      }`}
-                    >
-                      {layer.visible ? '👁️ Visible' : '👁️‍🗨️ Hidden'}
-                    </button>
-                  </div>
-                </div>
+                )}
+              </div>
 
-                {/* Layer Info */}
-                <div className="flex justify-between text-xs text-gray-500">
-                  <span>{layer.dimensions.width} × {layer.dimensions.height}px</span>
-                  <span>({layer.position.x}, {layer.position.y}) z:{layer.position.zIndex}</span>
+              {/* Layer Info */}
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-medium text-gray-800 truncate">
+                  {layer.name}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {Math.round(layer.opacity * 100)}%
                 </div>
               </div>
+
+              {/* Controls */}
+              <div className="flex flex-col space-y-1">
+                {/* Move Up */}
+                <button
+                  onClick={() => onLayerReorder(layer.id, 'up')}
+                  className={`w-6 h-6 rounded flex items-center justify-center text-xs transition-all duration-200 ${
+                    !canMoveUp(layer.id)
+                      ? 'opacity-50 cursor-not-allowed bg-gray-500 text-white'
+                      : 'cursor-pointer bg-gray-500 text-white hover:bg-gray-600'
+                  }`}
+                  disabled={!canMoveUp(layer.id)}
+                  title="Move up"
+                >
+                  ↑
+                </button>
+                
+                {/* Move Down */}
+                <button
+                  onClick={() => onLayerReorder(layer.id, 'down')}
+                  className={`w-6 h-6 rounded flex items-center justify-center text-xs transition-all duration-200 ${
+                    !canMoveDown(layer.id)
+                      ? 'opacity-50 cursor-not-allowed bg-gray-500 text-white'
+                      : 'cursor-pointer bg-gray-500 text-white hover:bg-gray-600'
+                  }`}
+                  disabled={!canMoveDown(layer.id)}
+                  title="Move down"
+                >
+                  ↓
+                </button>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col space-y-1">
+                {/* Magnifier */}
+                <button
+                  onClick={() => setPreviewLayer(layer)}
+                  className="w-6 h-6 rounded flex items-center justify-center text-xs transition-all duration-200 cursor-pointer bg-blue-500 text-white hover:bg-blue-600"
+                  title="Preview layer"
+                >
+                  🔍
+                </button>
+                
+                {/* Visibility Toggle */}
+                <button
+                  onClick={() => handleVisibilityToggle(layer.id, !layer.visible)}
+                  className={`w-6 h-6 rounded flex items-center justify-center text-xs transition-all duration-200 cursor-pointer ${
+                    layer.visible 
+                      ? 'bg-blue-500 text-white hover:bg-blue-600'
+                      : 'bg-gray-500 text-white hover:bg-gray-600'
+                  }`}
+                  title={layer.visible ? 'Hide layer' : 'Show layer'}
+                >
+                  {layer.visible ? '👁️' : '🙈'}
+                </button>
+              </div>
+
+              {/* Delete Button (only for non-base layers) */}
+              {!layer.isBase && (
+                <button
+                  onClick={() => onLayerDelete(layer.id)}
+                  className="w-6 h-6 rounded flex items-center justify-center text-xs transition-all duration-200 cursor-pointer bg-red-500 text-white hover:bg-red-600"
+                  title="Delete layer"
+                >
+                  ✕
+                </button>
+              )}
             </div>
-          ))}
+          ))
+          )}
         </div>
-      )}
-      
-      <div className="text-xs text-gray-500 space-y-1">
-        <p>• Click layer names to edit them</p>
-        <p>• Use ↑↓ buttons to reorder layers</p>
-        <p>• Base layer cannot be deleted or reordered</p>
+
+        <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500 space-y-1">
+          <p>• Green dot = visible, Gray = hidden</p>
+          <p>• B = Base layer (cannot be deleted)</p>
+          <p>• 🔍 = Preview full layer</p>
+        </div>
       </div>
-    </div>
+
+      {/* Layer Preview Modal */}
+      {previewLayer && (
+        <LayerPreviewModal
+          layer={previewLayer}
+          onClose={() => setPreviewLayer(null)}
+        />
+      )}
+    </>
   )
 } 

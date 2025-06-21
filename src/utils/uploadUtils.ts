@@ -39,29 +39,26 @@ export const loadImageFromFile = (file: File): Promise<{
 
 export const createLayerFromFile = async (
   file: File, 
-  isBase: boolean = false,
-  suggestedPosition?: { x: number; y: number }
+  canvasCenter: { x: number; y: number },
+  zIndex: number = Date.now()
 ): Promise<UploadedLayer> => {
   const { imageData, dimensions } = await loadImageFromFile(file)
   
-  // Calculate suggested position based on whether it's a base layer or additional layer
-  const defaultPosition = isBase 
-    ? { x: 0, y: 0, zIndex: 0 }
-    : { 
-        x: suggestedPosition?.x ?? 0, 
-        y: suggestedPosition?.y ?? 0, 
-        zIndex: Date.now() // Use timestamp for unique z-index
-      }
+  // Center the layer on the canvas
+  const position = {
+    x: canvasCenter.x - dimensions.width / 2,
+    y: canvasCenter.y - dimensions.height / 2,
+    zIndex
+  }
 
   return {
     id: generateLayerId(),
     name: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
     imageData,
     dimensions,
-    position: defaultPosition,
+    position,
     opacity: 1,
-    visible: true,
-    isBase
+    visible: true
   }
 }
 
@@ -125,8 +122,7 @@ export const exportLayerStack = (layers: UploadedLayer[]): string => {
       dimensions: layer.dimensions,
       position: layer.position,
       opacity: layer.opacity,
-      visible: layer.visible,
-      isBase: layer.isBase
+      visible: layer.visible
       // Note: imageData is excluded from export for size reasons
     }))
   }, null, 2)
