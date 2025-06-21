@@ -46,4 +46,33 @@ export type ColorVariation = {
 export type SpriteAssetWithVariations = SpriteAssetInfo & {
   colorVariations: ColorVariation[]
   defaultFrame: number // Default animation frame to use for character creation
+}
+
+// New types for uploaded layer system
+export type LayerPosition = {
+  x: number
+  y: number
+  zIndex: number
+}
+
+export type UploadedLayer = {
+  id: string
+  name: string
+  imageData: string // base64 data URL
+  dimensions: SpriteDimensions
+  position: LayerPosition
+  opacity: number
+  visible: boolean
+  isBase?: boolean // True for the character base layer
+}
+
+export type LayerStack = {
+  baseLayer: UploadedLayer | null
+  additionalLayers: UploadedLayer[]
+}
+
+export type DragState = {
+  isDragging: boolean
+  draggedLayerId: string | null
+  dragOffset: { x: number; y: number }
 } 
