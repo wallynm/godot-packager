@@ -1,4 +1,4 @@
-import type { UploadedLayer, SpriteDimensions } from '../types/sprite'
+import type { UploadedLayer } from '../types/sprite'
 
 export const generateLayerId = (): string => {
   return `layer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -6,7 +6,8 @@ export const generateLayerId = (): string => {
 
 export const loadImageFromFile = (file: File): Promise<{
   imageData: string
-  dimensions: SpriteDimensions
+  width: number
+  height: number
 }> => {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith('image/')) {
@@ -23,10 +24,8 @@ export const loadImageFromFile = (file: File): Promise<{
       img.onload = () => {
         resolve({
           imageData,
-          dimensions: {
-            width: img.width,
-            height: img.height
-          }
+          width: img.width,
+          height: img.height
         })
       }
       img.onerror = () => reject(new Error('Failed to load image'))
@@ -39,44 +38,62 @@ export const loadImageFromFile = (file: File): Promise<{
 
 export const createLayerFromFile = async (
   file: File, 
-  canvasCenter: { x: number; y: number },
-  zIndex: number = Date.now()
+  isBase: boolean = false,
+  existingLayers: UploadedLayer[] = []
 ): Promise<UploadedLayer> => {
-  const { imageData, dimensions } = await loadImageFromFile(file)
+  const { imageData, width, height } = await loadImageFromFile(file)
   
-  // Center the layer on the canvas
-  const position = {
-    x: canvasCenter.x - dimensions.width / 2,
-    y: canvasCenter.y - dimensions.height / 2,
-    zIndex
+  // Calculate position based on whether it's a base layer or additional layer
+  let position
+  if (isBase || existingLayers.length === 0) {
+    // Base layers start at center
+    position = {
+      x: 0,
+      y: 0,
+      zIndex: isBase ? 0 : Date.now()
+    }
+  } else {
+    // Additional layers get suggested positioning
+    const suggestedPos = calculateSuggestedPosition(
+      { width, height },
+      existingLayers.find(l => l.isBase) || null,
+      existingLayers
+    )
+    position = {
+      x: suggestedPos.x,
+      y: suggestedPos.y,
+      zIndex: Date.now()
+    }
   }
 
   return {
     id: generateLayerId(),
     name: file.name.replace(/\.[^/.]+$/, ''), // Remove file extension
     imageData,
-    dimensions,
+    width,
+    height,
     position,
     opacity: 1,
-    visible: true
+    visible: true,
+    isBase
   }
 }
 
 export const calculateSuggestedPosition = (
-  newLayerDimensions: SpriteDimensions,
-  baseDimensions: SpriteDimensions | null,
+  newLayerDimensions: { width: number; height: number },
+  baseLayer: UploadedLayer | null,
   existingLayers: UploadedLayer[]
 ): { x: number; y: number } => {
-  if (!baseDimensions) {
+  if (!baseLayer) {
     return { x: 0, y: 0 }
   }
 
   // If the new layer is larger than the base, suggest centering it
-  if (newLayerDimensions.width > baseDimensions.width || 
-      newLayerDimensions.height > baseDimensions.height) {
+  if (newLayerDimensions.width > baseLayer.width || 
+      newLayerDimensions.height > baseLayer.height) {
     return {
-      x: Math.max(0, (baseDimensions.width - newLayerDimensions.width) / 2),
-      y: Math.max(0, (baseDimensions.height - newLayerDimensions.height) / 2)
+      x: Math.max(0, (baseLayer.width - newLayerDimensions.width) / 2),
+      y: Math.max(0, (baseLayer.height - newLayerDimensions.height) / 2)
     }
   }
 
@@ -84,14 +101,14 @@ export const calculateSuggestedPosition = (
   const occupied = existingLayers.map(layer => ({
     x: layer.position.x,
     y: layer.position.y,
-    width: layer.dimensions.width,
-    height: layer.dimensions.height
+    width: layer.width,
+    height: layer.height
   }))
 
   // Simple algorithm: try positions in a grid pattern
   const step = 32 // 32px steps
-  for (let y = 0; y <= baseDimensions.height - newLayerDimensions.height; y += step) {
-    for (let x = 0; x <= baseDimensions.width - newLayerDimensions.width; x += step) {
+  for (let y = 0; y <= baseLayer.height - newLayerDimensions.height; y += step) {
+    for (let x = 0; x <= baseLayer.width - newLayerDimensions.width; x += step) {
       const overlaps = occupied.some(rect => 
         x < rect.x + rect.width &&
         x + newLayerDimensions.width > rect.x &&
@@ -107,8 +124,8 @@ export const calculateSuggestedPosition = (
 
   // If no free space found, default to center
   return {
-    x: (baseDimensions.width - newLayerDimensions.width) / 2,
-    y: (baseDimensions.height - newLayerDimensions.height) / 2
+    x: (baseLayer.width - newLayerDimensions.width) / 2,
+    y: (baseLayer.height - newLayerDimensions.height) / 2
   }
 }
 
@@ -119,10 +136,12 @@ export const exportLayerStack = (layers: UploadedLayer[]): string => {
     layers: layers.map(layer => ({
       id: layer.id,
       name: layer.name,
-      dimensions: layer.dimensions,
+      width: layer.width,
+      height: layer.height,
       position: layer.position,
       opacity: layer.opacity,
-      visible: layer.visible
+      visible: layer.visible,
+      isBase: layer.isBase
       // Note: imageData is excluded from export for size reasons
     }))
   }, null, 2)

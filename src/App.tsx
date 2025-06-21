@@ -1,148 +1,97 @@
-import { useState, useCallback } from 'react'
-import { UploadPanel } from './components/UploadPanel'
+import React, { useState } from 'react'
+import UploadPanel from './components/UploadPanel'
 import { DraggableCanvas } from './components/DraggableCanvas'
-import { LayerManagement } from './components/LayerManagement'
-import { UploadExportPanel } from './components/UploadExportPanel'
-import type { UploadedLayer } from './types/sprite'
-import { calculateSuggestedPosition } from './utils/uploadUtils'
+import UploadExportPanel from './components/UploadExportPanel'
+import type { UploadedLayer, ExportConfig } from './types/sprite'
 
 const App = () => {
-  const [baseLayer, setBaseLayer] = useState<UploadedLayer | null>(null)
-  const [additionalLayers, setAdditionalLayers] = useState<UploadedLayer[]>([])
+  const [layers, setLayers] = useState<UploadedLayer[]>([])
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null)
+  const [exportConfig, setExportConfig] = useState<ExportConfig>({
+    width: 800,
+    height: 600,
+    name: 'character'
+  })
 
-  const handleBaseLayerUpload = useCallback((layer: UploadedLayer) => {
-    setBaseLayer(layer)
-    setSelectedLayerId(layer.id)
-  }, [])
-
-  const handleAdditionalLayerUpload = useCallback((layer: UploadedLayer) => {
-    // Recalculate position with actual dimensions
-    if (baseLayer) {
-      const suggestedPosition = calculateSuggestedPosition(
-        layer.dimensions,
-        baseLayer.dimensions,
-        additionalLayers
-      )
-      layer.position.x = suggestedPosition.x
-      layer.position.y = suggestedPosition.y
-    }
-
-    setAdditionalLayers(prev => [...prev, layer])
-    setSelectedLayerId(layer.id)
-  }, [baseLayer, additionalLayers])
-
-  const handleLayerPositionChange = useCallback((layerId: string, x: number, y: number) => {
-    if (baseLayer?.id === layerId) {
-      setBaseLayer(prev => prev ? {
-        ...prev,
-        position: { ...prev.position, x, y }
-      } : null)
-    } else {
-      setAdditionalLayers(prev => prev.map(layer =>
-        layer.id === layerId
-          ? { ...layer, position: { ...layer.position, x, y } }
-          : layer
-      ))
-    }
-  }, [baseLayer?.id])
-
-  const handleLayerUpdate = useCallback((layerId: string, updates: Partial<UploadedLayer>) => {
-    if (baseLayer?.id === layerId) {
-      setBaseLayer(prev => prev ? { ...prev, ...updates } : null)
-    } else {
-      setAdditionalLayers(prev => prev.map(layer =>
-        layer.id === layerId ? { ...layer, ...updates } : layer
-      ))
-    }
-  }, [baseLayer?.id])
-
-  const handleLayerDelete = useCallback((layerId: string) => {
-    setAdditionalLayers(prev => prev.filter(layer => layer.id !== layerId))
-    if (selectedLayerId === layerId) {
-      setSelectedLayerId(null)
-    }
-  }, [selectedLayerId])
-
-  const handleLayerReorder = useCallback((layerId: string, direction: 'up' | 'down') => {
-    const layer = additionalLayers.find(l => l.id === layerId)
-    if (!layer) return
-
-    const allLayers = baseLayer ? [baseLayer, ...additionalLayers] : additionalLayers
-    const sortedLayers = [...allLayers].sort((a, b) => a.position.zIndex - b.position.zIndex)
-    const currentIndex = sortedLayers.findIndex(l => l.id === layerId)
-    
-    if (currentIndex === -1) return
-
-    let newZIndex: number
-    if (direction === 'up' && currentIndex < sortedLayers.length - 1) {
-      newZIndex = sortedLayers[currentIndex + 1].position.zIndex + 1
-    } else if (direction === 'down' && currentIndex > 0) {
-      newZIndex = sortedLayers[currentIndex - 1].position.zIndex - 1
-    } else {
-      return
-    }
-
-    setAdditionalLayers(prev => prev.map(l =>
-      l.id === layerId
-        ? { ...l, position: { ...l.position, zIndex: newZIndex } }
-        : l
+  const handleLayerUpdate = (layerId: string, updates: Partial<UploadedLayer>) => {
+    setLayers(prev => prev.map(layer =>
+      layer.id === layerId ? { ...layer, ...updates } : layer
     ))
-  }, [additionalLayers, baseLayer])
+  }
+
+  const handleLayersChange = (newLayers: UploadedLayer[]) => {
+    const previousLayerCount = layers.length
+    const isFirstUpload = previousLayerCount === 0 && newLayers.length > 0
+    
+    if (isFirstUpload) {
+      // Update export config with the first uploaded image dimensions
+      const firstLayer = newLayers[0]
+      setExportConfig(prev => ({
+        ...prev,
+        width: firstLayer.width,
+        height: firstLayer.height
+      }))
+    }
+    
+    setLayers(newLayers)
+  }
+
+  const handleConfigChange = (config: { width: number; height: number; name: string }) => {
+    setExportConfig(prev => ({
+      ...prev,
+      width: config.width,
+      height: config.height,
+      name: config.name
+    }))
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-          Character Layer Builder
-        </h1>
-        
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Canvas Section */}
-          <div className="xl:col-span-2">
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-semibold mb-4">Canvas</h2>
-              <DraggableCanvas
-                baseLayer={baseLayer}
-                additionalLayers={additionalLayers}
-                onLayerPositionChange={handleLayerPositionChange}
-                onLayerSelect={setSelectedLayerId}
-                selectedLayerId={selectedLayerId}
-              />
-            </div>
-          </div>
+    <div className="h-screen bg-gray-100" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', width: '100vw' }}>
+      {/* Main Canvas Area */}
+      <div className="relative min-w-0 w-full">
+        <div className="h-full flex flex-col">
+          <header className="bg-white border-b border-gray-200 px-6 py-4">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              Character Creator
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Upload and arrange character layers to create your custom sprite
+            </p>
+          </header>
           
-          {/* Control Panels */}
-          <div className="space-y-6">
-            {/* Upload Panel */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <UploadPanel
-                baseLayer={baseLayer}
-                additionalLayers={additionalLayers}
-                onBaseLayerUpload={handleBaseLayerUpload}
-                onAdditionalLayerUpload={handleAdditionalLayerUpload}
-              />
-            </div>
-
-            {/* Export Panel */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <UploadExportPanel
-                baseLayer={baseLayer}
-                additionalLayers={additionalLayers}
-              />
-            </div>
+          <div className="flex-1 min-h-0">
+            <DraggableCanvas
+              layers={layers}
+              selectedLayerId={selectedLayerId}
+              exportConfig={exportConfig}
+              onLayerUpdate={handleLayerUpdate}
+              onLayerSelect={setSelectedLayerId}
+            />
           </div>
         </div>
-
-        {/* Floating Layer Management Panel */}
-        <LayerManagement
-          baseLayer={baseLayer}
-          additionalLayers={additionalLayers}
-          selectedLayerId={selectedLayerId}
-          onLayerUpdate={handleLayerUpdate}
-          onLayerDelete={handleLayerDelete}
-          onLayerReorder={handleLayerReorder}
-        />
+      </div>
+      
+      {/* Sidebar */}
+      <div className="bg-white border-l border-gray-200 overflow-hidden" style={{ 
+        width: '320px', 
+        minWidth: '320px', 
+        maxWidth: '320px',
+        boxSizing: 'border-box'
+      }}>
+        <div className="h-full overflow-y-auto">
+          <div className="p-4 space-y-6" style={{ width: '100%', maxWidth: '320px', boxSizing: 'border-box' }}>
+            <UploadPanel
+              layers={layers}
+              onLayersChange={handleLayersChange}
+            />
+            
+            <UploadExportPanel
+              layers={layers}
+              canvasSize={{ width: exportConfig.width, height: exportConfig.height }}
+              onConfigChange={handleConfigChange}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

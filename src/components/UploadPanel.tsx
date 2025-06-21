@@ -1,222 +1,279 @@
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { tv } from 'tailwind-variants'
+import { createLayerFromFile } from '../utils/uploadUtils'
 import type { UploadedLayer } from '../types/sprite'
-import { createLayerFromFile, calculateSuggestedPosition } from '../utils/uploadUtils'
 
-type UploadPanelProps = {
-  baseLayer: UploadedLayer | null
-  additionalLayers: UploadedLayer[]
-  onBaseLayerUpload: (layer: UploadedLayer) => void
-  onAdditionalLayerUpload: (layer: UploadedLayer) => void
-}
-
-const uploadArea = tv({
-  base: 'border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 cursor-pointer',
-  variants: {
-    dragOver: {
-      true: 'border-blue-500 bg-blue-50',
-      false: 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-    },
-    hasBase: {
-      true: 'border-green-300 bg-green-50',
-      false: ''
-    }
+const uploadPanel = tv({
+  slots: {
+    container: 'bg-white rounded-lg shadow-sm border overflow-hidden w-full',
+    title: 'text-lg font-semibold mb-4',
+    section: 'mb-6 w-full overflow-hidden',
+    sectionTitle: 'text-sm font-medium text-gray-700 mb-2',
+    dropZone: 'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
+    dropZoneActive: 'border-blue-500 bg-blue-50',
+    dropZoneInactive: 'border-gray-300 hover:border-gray-400',
+    dropZoneText: 'text-gray-600 mb-2',
+    dropZoneSubtext: 'text-sm text-gray-500',
+    fileInput: 'hidden',
+    button: 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors',
+    layersList: 'space-y-2 w-full overflow-hidden',
+    layerItem: 'flex items-center justify-between p-3 bg-gray-50 rounded-md min-w-0 w-full overflow-hidden',
+    layerInfo: 'flex items-center space-x-3 min-w-0 flex-1 overflow-hidden',
+    layerPreviewContainer: 'w-12 h-12 border rounded bg-gray-100 flex-shrink-0 cursor-pointer hover:opacity-80 overflow-hidden relative',
+    layerPreview: 'w-full h-full object-cover absolute inset-0',
+    layerName: 'font-medium truncate',
+    layerSize: 'text-sm text-gray-500 truncate',
+    layerOrder: 'text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium flex-shrink-0',
+    layerControls: 'flex items-center space-x-2',
+    layerButton: 'px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded',
+    magnifierButton: 'px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded',
+    removeButton: 'text-red-600 hover:text-red-800 text-sm',
+    modal: 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50',
+    modalContent: 'max-w-4xl max-h-4xl bg-white rounded-lg p-4 relative',
+    modalImage: 'max-w-full max-h-full object-contain',
+    modalClose: 'absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl cursor-pointer',
+    modalInfo: 'text-center text-gray-600 mt-2'
   }
 })
 
+type UploadPanelProps = {
+  layers: UploadedLayer[]
+  onLayersChange: (layers: UploadedLayer[]) => void
+}
 
+const UploadPanel = ({ layers, onLayersChange }: UploadPanelProps) => {
+  const styles = uploadPanel()
+  const [dragActive, setDragActive] = React.useState(false)
+  const [selectedImageForModal, setSelectedImageForModal] = useState<UploadedLayer | null>(null)
+  
+  const baseLayers = layers.filter(layer => layer.isBase)
+  const additionalLayers = layers.filter(layer => !layer.isBase)
 
-export const UploadPanel = ({ 
-  baseLayer, 
-  additionalLayers, 
-  onBaseLayerUpload, 
-  onAdditionalLayerUpload 
-}: UploadPanelProps) => {
-  const [isDragOver, setIsDragOver] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const handleDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true)
+    } else if (e.type === 'dragleave') {
+      setDragActive(false)
+    }
+  }, [])
 
-  const handleFileUpload = useCallback(async (files: FileList, isBase: boolean = false) => {
-    if (files.length === 0) return
-
-    setIsUploading(true)
-    setError(null)
+  const handleDrop = useCallback(async (e: React.DragEvent, isBase: boolean = false) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    
+    const files = Array.from(e.dataTransfer.files)
+    const imageFiles = files.filter(file => file.type.startsWith('image/'))
+    
+    if (imageFiles.length === 0) return
 
     try {
-      const file = files[0]
+      const newLayers = await Promise.all(
+        imageFiles.map(file => createLayerFromFile(file, isBase, layers))
+      )
       
-      if (isBase) {
-        const layer = await createLayerFromFile(file, true)
-        onBaseLayerUpload(layer)
-      } else {
-        // Calculate suggested position for additional layers
-        const suggestedPosition = baseLayer 
-          ? calculateSuggestedPosition(
-              { width: 0, height: 0 }, // Will be calculated in createLayerFromFile
-              baseLayer.dimensions,
-              additionalLayers
-            )
-          : { x: 0, y: 0 }
-
-        const layer = await createLayerFromFile(file, false, suggestedPosition)
-        onAdditionalLayerUpload(layer)
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upload file')
-    } finally {
-      setIsUploading(false)
+      onLayersChange([...layers, ...newLayers])
+    } catch (error) {
+      console.error('Error processing uploaded files:', error)
     }
-  }, [baseLayer, additionalLayers, onBaseLayerUpload, onAdditionalLayerUpload])
+  }, [layers, onLayersChange])
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
+  const handleFileInput = useCallback(async (e: React.ChangeEvent<HTMLInputElement>, isBase: boolean = false) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+
+    try {
+      const newLayers = await Promise.all(
+        files.map(file => createLayerFromFile(file, isBase, layers))
+      )
+      
+      onLayersChange([...layers, ...newLayers])
+    } catch (error) {
+      console.error('Error processing uploaded files:', error)
+    }
     
-    const files = e.dataTransfer.files
-    handleFileUpload(files, !baseLayer)
-  }, [baseLayer, handleFileUpload])
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }, [])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-  }, [])
-
-  const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>, isBase: boolean = false) => {
-    const files = e.target.files
-    if (files) {
-      handleFileUpload(files, isBase)
-    }
-    // Reset input value to allow re-uploading the same file
     e.target.value = ''
-  }, [handleFileUpload])
+  }, [layers, onLayersChange])
 
-  return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-800">Upload Layers</h3>
-        
-        {!baseLayer ? (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600">First, upload a character base layer:</p>
-            <div
-              className={uploadArea({ dragOver: isDragOver, hasBase: false })}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onClick={() => document.getElementById('base-file-input')?.click()}
-            >
-              <div className="space-y-2">
-                <div className="text-4xl text-gray-400">📤</div>
-                <p className="text-gray-600">
-                  Drop your character base image here or click to browse
-                </p>
-                <p className="text-xs text-gray-500">
-                  Supports PNG, JPG, GIF, WebP
-                </p>
-              </div>
-              <input
-                id="base-file-input"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => handleFileInput(e, true)}
-                disabled={isUploading}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-white rounded border overflow-hidden">
-                  <img 
-                    src={baseLayer.imageData} 
-                    alt={baseLayer.name}
-                    className="w-full h-full object-contain"
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                </div>
-                <div>
-                  <p className="font-medium text-green-800">{baseLayer.name}</p>
-                  <p className="text-sm text-green-600">
-                    {baseLayer.dimensions.width} × {baseLayer.dimensions.height}px
-                  </p>
-                </div>
-              </div>
-            </div>
+  const removeLayer = useCallback((layerId: string) => {
+    onLayersChange(layers.filter(layer => layer.id !== layerId))
+  }, [layers, onLayersChange])
 
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Add additional layers:</p>
-              <div
-                className={uploadArea({ dragOver: isDragOver, hasBase: true })}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onClick={() => document.getElementById('layer-file-input')?.click()}
-              >
-                <div className="space-y-2">
-                  <div className="text-4xl text-gray-400">🎨</div>
-                  <p className="text-gray-600">
-                    Drop additional layers here or click to browse
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Layers will be positioned automatically, then you can drag to adjust
-                  </p>
-                </div>
-                <input
-                  id="layer-file-input"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileInput(e, false)}
-                  disabled={isUploading}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+  const moveLayerUp = useCallback((layerId: string) => {
+    const layer = layers.find(l => l.id === layerId)
+    if (!layer) return
 
-        {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
+    const maxZIndex = Math.max(...layers.map(l => l.position.zIndex))
+    onLayersChange(layers.map(l => 
+      l.id === layerId 
+        ? { ...l, position: { ...l.position, zIndex: maxZIndex + 1 } }
+        : l
+    ))
+  }, [layers, onLayersChange])
 
-        {isUploading && (
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-600">Uploading...</p>
-          </div>
-        )}
-      </div>
+  const moveLayerDown = useCallback((layerId: string) => {
+    const layer = layers.find(l => l.id === layerId)
+    if (!layer) return
 
-      <div className="space-y-2">
-        <h4 className="font-medium text-gray-800">Layer Stack ({additionalLayers.length + (baseLayer ? 1 : 0)})</h4>
-        <div className="space-y-2 max-h-40 overflow-y-auto">
-          {baseLayer && (
-            <div className="flex items-center space-x-2 p-2 bg-green-50 border border-green-200 rounded text-sm">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              <span className="font-medium">{baseLayer.name}</span>
-              <span className="text-gray-500">(Base)</span>
-            </div>
-          )}
-          {additionalLayers
-            .sort((a, b) => b.position.zIndex - a.position.zIndex)
-            .map((layer) => (
-              <div key={layer.id} className="flex items-center space-x-2 p-2 bg-gray-50 border border-gray-200 rounded text-sm">
-                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                <span>{layer.name}</span>
-                <span className="text-gray-500">
-                  ({layer.position.x}, {layer.position.y})
-                </span>
-              </div>
-            ))}
+    const minZIndex = Math.min(...layers.map(l => l.position.zIndex))
+    onLayersChange(layers.map(l => 
+      l.id === layerId 
+        ? { ...l, position: { ...l.position, zIndex: Math.max(0, minZIndex - 1) } }
+        : l
+    ))
+  }, [layers, onLayersChange])
+
+  const renderDropZone = (isBase: boolean, title: string, description: string) => (
+    <div className={styles.section()}>
+      <h3 className={styles.sectionTitle()}>{title}</h3>
+      <div
+        className={`${styles.dropZone()} ${dragActive ? styles.dropZoneActive() : styles.dropZoneInactive()}`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={(e) => handleDrop(e, isBase)}
+      >
+        <div className={styles.dropZoneText()}>
+          Drop images here or click to select
         </div>
+        <div className={styles.dropZoneSubtext()}>
+          {description}
+        </div>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={(e) => handleFileInput(e, isBase)}
+          className={styles.fileInput()}
+          id={isBase ? 'base-upload' : 'layer-upload'}
+        />
+        <label htmlFor={isBase ? 'base-upload' : 'layer-upload'} className={styles.button()}>
+          Select Files
+        </label>
       </div>
     </div>
   )
-} 
+
+  const renderLayersList = (layersList: UploadedLayer[], title: string) => {
+    if (layersList.length === 0) return null
+
+    // Sort layers by zIndex in descending order (top layers first in UI)
+    const sortedLayers = [...layersList].sort((a, b) => b.position.zIndex - a.position.zIndex)
+
+    return (
+      <div className={styles.section()}>
+        <h3 className={styles.sectionTitle()}>{title}</h3>
+        <div className={styles.layersList()}>
+          {sortedLayers.map((layer, index) => (
+            <div key={layer.id} className={styles.layerItem()}>
+              <div className={styles.layerInfo()}>
+                <div 
+                  className={styles.layerPreviewContainer()}
+                  onClick={() => setSelectedImageForModal(layer)}
+                  title="Click to view full image"
+                >
+                  <img
+                    src={layer.imageData}
+                    alt={layer.name}
+                    className={styles.layerPreview()}
+                  />
+                </div>
+                <div className="flex-1 min-w-0 overflow-hidden" style={{ maxWidth: '200px' }}>
+                  <div className="flex items-center gap-2">
+                    <div className={styles.layerName()}>{layer.name}</div>
+                    <div className={styles.layerOrder()} title={`Layer order: ${index + 1} of ${sortedLayers.length} (zIndex: ${layer.position.zIndex})`}>
+                      #{index + 1}
+                    </div>
+                  </div>
+                  <div className={styles.layerSize()}>
+                    {layer.width} × {layer.height}px
+                  </div>
+                </div>
+              </div>
+              <div className={styles.layerControls()}>
+                <button
+                  onClick={() => setSelectedImageForModal(layer)}
+                  className={styles.magnifierButton()}
+                  title="View full image"
+                >
+                  🔍
+                </button>
+                <button
+                  onClick={() => moveLayerUp(layer.id)}
+                  className={styles.layerButton()}
+                  title="Move layer up"
+                >
+                  ↑
+                </button>
+                <button
+                  onClick={() => moveLayerDown(layer.id)}
+                  className={styles.layerButton()}
+                  title="Move layer down"
+                >
+                  ↓
+                </button>
+                <button
+                  onClick={() => removeLayer(layer.id)}
+                  className={styles.removeButton()}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className={styles.container()}>
+        <div className="p-4" style={{ maxWidth: '100%', width: '100%', boxSizing: 'border-box' }}>
+          <h2 className={styles.title()}>Upload Layers</h2>
+        
+          {renderDropZone(true, 'Base Character', 'Upload your main character sprite')}
+          {renderLayersList(baseLayers, 'Base Layers')}
+          
+          {renderDropZone(false, 'Additional Layers', 'Upload hair, clothes, accessories, etc.')}
+          {renderLayersList(additionalLayers, 'Additional Layers')}
+        </div>
+      </div>
+
+      {/* Image Modal */}
+      {selectedImageForModal && (
+        <div 
+          className={styles.modal()}
+          onClick={() => setSelectedImageForModal(null)}
+        >
+          <div 
+            className={styles.modalContent()}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className={styles.modalClose()}
+              onClick={() => setSelectedImageForModal(null)}
+            >
+              ×
+            </button>
+            <img
+              src={selectedImageForModal.imageData}
+              alt={selectedImageForModal.name}
+              className={styles.modalImage()}
+            />
+            <div className={styles.modalInfo()}>
+              <div className="font-medium">{selectedImageForModal.name}</div>
+              <div className="text-sm">
+                {selectedImageForModal.width} × {selectedImageForModal.height}px
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+export default UploadPanel 

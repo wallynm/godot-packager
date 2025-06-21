@@ -59,10 +59,12 @@ export type UploadedLayer = {
   id: string
   name: string
   imageData: string // base64 data URL
-  dimensions: SpriteDimensions
+  width: number
+  height: number
   position: LayerPosition
   opacity: number
   visible: boolean
+  isBase: boolean
 }
 
 export type ExportConfig = {

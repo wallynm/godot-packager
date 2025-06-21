@@ -1,189 +1,313 @@
-import { useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { tv } from 'tailwind-variants'
-import type { UploadedLayer } from '../types/sprite'
 import { exportLayerStack } from '../utils/uploadUtils'
+import type { UploadedLayer } from '../types/sprite'
 
-type UploadExportPanelProps = {
-  baseLayer: UploadedLayer | null
-  additionalLayers: UploadedLayer[]
-}
-
-const exportButton = tv({
-  base: 'px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2',
-  variants: {
-    variant: {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700',
-      secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-      success: 'bg-green-600 text-white hover:bg-green-700'
-    },
-    disabled: {
-      true: 'opacity-50 cursor-not-allowed',
-      false: ''
-    }
+const exportPanel = tv({
+  slots: {
+    container: 'p-6 bg-white rounded-lg shadow-sm border',
+    title: 'text-lg font-semibold mb-4',
+    section: 'mb-6',
+    sectionTitle: 'text-sm font-medium text-gray-700 mb-2',
+    buttonGroup: 'flex flex-wrap gap-2',
+    button: 'px-4 py-2 rounded-md font-medium transition-colors',
+    primaryButton: 'bg-blue-600 text-white hover:bg-blue-700',
+    secondaryButton: 'bg-gray-100 text-gray-700 hover:bg-gray-200 border',
+    exportConfig: 'space-y-3 p-4 bg-gray-50 rounded-lg',
+    configRow: 'flex items-center justify-between',
+    configLabel: 'text-sm font-medium text-gray-700',
+    configInput: 'px-3 py-1 border rounded text-sm w-24',
+    layerPreview: 'space-y-2 max-h-32 overflow-y-auto',
+    layerItem: 'flex items-center space-x-2 text-sm',
+    layerIndicator: 'w-3 h-3 rounded-full',
+    baseIndicator: 'bg-green-500',
+    additionalIndicator: 'bg-blue-500',
+    layerName: 'truncate'
   }
 })
 
-export const UploadExportPanel = ({ baseLayer, additionalLayers }: UploadExportPanelProps) => {
-  const allLayers = baseLayer ? [baseLayer, ...additionalLayers] : additionalLayers
-  const hasLayers = allLayers.length > 0
+type UploadExportPanelProps = {
+  layers: UploadedLayer[]
+  canvasSize: { width: number; height: number }
+  onExport?: (format: 'png' | 'json' | 'godot', data: string | Blob) => void
+  onConfigChange?: (config: { width: number; height: number; name: string }) => void
+}
+
+const UploadExportPanel = ({ layers, canvasSize, onExport, onConfigChange }: UploadExportPanelProps) => {
+  const styles = exportPanel()
+  const [exportName, setExportName] = React.useState('character')
+  const [exportWidth, setExportWidth] = React.useState(canvasSize.width)
+  const [exportHeight, setExportHeight] = React.useState(canvasSize.height)
+
+  // Update local state when canvasSize prop changes
+  React.useEffect(() => {
+    setExportWidth(canvasSize.width)
+    setExportHeight(canvasSize.height)
+  }, [canvasSize.width, canvasSize.height])
+
+  const visibleLayers = layers.filter(layer => layer.visible)
+  const baseLayers = visibleLayers.filter(layer => layer.isBase)
+  const additionalLayers = visibleLayers.filter(layer => !layer.isBase)
 
   const exportToPNG = useCallback(async () => {
-    if (!hasLayers) return
+    if (visibleLayers.length === 0) return
 
-    // Calculate canvas dimensions
-    const canvasDimensions = allLayers.reduce(
-      (acc, layer) => ({
-        width: Math.max(acc.width, layer.position.x + layer.dimensions.width),
-        height: Math.max(acc.height, layer.position.y + layer.dimensions.height)
-      }),
-      { width: 0, height: 0 }
-    )
-
-    // Create canvas element
     const canvas = document.createElement('canvas')
-    canvas.width = canvasDimensions.width
-    canvas.height = canvasDimensions.height
+    canvas.width = exportWidth
+    canvas.height = exportHeight
     const ctx = canvas.getContext('2d')
-
+    
     if (!ctx) return
 
     // Sort layers by z-index
-    const sortedLayers = [...allLayers].sort((a, b) => a.position.zIndex - b.position.zIndex)
+    const sortedLayers = [...visibleLayers].sort((a, b) => a.position.zIndex - b.position.zIndex)
 
-    // Draw each layer
-    for (const layer of sortedLayers) {
-      if (!layer.visible) continue
+    try {
+      // Draw each layer
+      for (const layer of sortedLayers) {
+        const img = new Image()
+        await new Promise<void>((resolve, reject) => {
+          img.onload = () => {
+            ctx.globalAlpha = layer.opacity
+            ctx.drawImage(
+              img,
+              layer.position.x,
+              layer.position.y,
+              layer.width,
+              layer.height
+            )
+            resolve()
+          }
+          img.onerror = reject
+          img.src = layer.imageData
+        })
+      }
 
-      const img = new Image()
-      await new Promise<void>((resolve) => {
-        img.onload = () => {
-          ctx.globalAlpha = layer.opacity
-          ctx.drawImage(
-            img,
-            layer.position.x,
-            layer.position.y,
-            layer.dimensions.width,
-            layer.dimensions.height
-          )
-          resolve()
+      canvas.toBlob((blob) => {
+        if (blob && onExport) {
+          onExport('png', blob)
         }
-        img.src = layer.imageData
-      })
+      }, 'image/png')
+    } catch (error) {
+      console.error('Error exporting to PNG:', error)
     }
-
-    // Download the image
-    canvas.toBlob((blob) => {
-      if (!blob) return
-      
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `character-${Date.now()}.png`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    })
-  }, [allLayers, hasLayers])
+  }, [visibleLayers, exportWidth, exportHeight, onExport])
 
   const exportToJSON = useCallback(() => {
-    if (!hasLayers) return
-
-    const jsonData = exportLayerStack(allLayers)
-    const blob = new Blob([jsonData], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `character-layers-${Date.now()}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, [allLayers, hasLayers])
+    const jsonData = exportLayerStack(visibleLayers)
+    if (onExport) {
+      onExport('json', jsonData)
+    }
+  }, [visibleLayers, onExport])
 
   const exportToGodot = useCallback(() => {
-    if (!hasLayers) return
-
     const godotResource = `[gd_resource type="Resource" format=3]
 
 [resource]
+name = "${exportName}"
 layers = [
-${allLayers.map((layer, index) => `  {
+${visibleLayers.map(layer => `  {
     "id": "${layer.id}",
     "name": "${layer.name}",
     "position": Vector2(${layer.position.x}, ${layer.position.y}),
+    "size": Vector2(${layer.width}, ${layer.height}),
     "z_index": ${layer.position.zIndex},
     "opacity": ${layer.opacity},
     "visible": ${layer.visible},
-    "dimensions": Vector2(${layer.dimensions.width}, ${layer.dimensions.height}),
-    "is_base": ${layer.isBase || false}
-  }${index < allLayers.length - 1 ? ',' : ''}`).join('\n')}
+    "is_base": ${layer.isBase}
+  }`).join(',\n')}
 ]
-created_at = "${new Date().toISOString()}"
-version = "1.0"
+canvas_size = Vector2(${exportWidth}, ${exportHeight})
+export_name = "${exportName}"
 `
 
-    const blob = new Blob([godotResource], { type: 'text/plain' })
+    if (onExport) {
+      onExport('godot', godotResource)
+    }
+  }, [visibleLayers, exportName, exportWidth, exportHeight, onExport])
+
+  const downloadFile = useCallback((data: string | Blob, filename: string, mimeType: string) => {
+    const blob = data instanceof Blob ? data : new Blob([data], { type: mimeType })
     const url = URL.createObjectURL(blob)
-    
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `character-layers-${Date.now()}.tres`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
     URL.revokeObjectURL(url)
-  }, [allLayers, hasLayers])
+  }, [])
+
+  const handleExport = useCallback((format: 'png' | 'json' | 'godot') => {
+    if (!onExport) {
+      // If no external handler, use internal download logic
+      const timestamp = new Date().toISOString().slice(0, 10)
+      const baseFilename = `${exportName}_${timestamp}`
+      
+      const internalExportHandler = (exportFormat: 'png' | 'json' | 'godot', data: string | Blob) => {
+        switch (exportFormat) {
+          case 'png':
+            downloadFile(data, `${baseFilename}.png`, 'image/png')
+            break
+          case 'json':
+            downloadFile(data, `${baseFilename}.json`, 'application/json')
+            break
+          case 'godot':
+            downloadFile(data, `${baseFilename}.tres`, 'text/plain')
+            break
+        }
+      }
+
+      // Temporarily override onExport for this call
+      switch (format) {
+        case 'png':
+          exportToPNG()
+          break
+        case 'json': {
+          const jsonData = exportLayerStack(visibleLayers)
+          internalExportHandler('json', jsonData)
+          break
+        }
+        case 'godot': {
+          const godotData = `[gd_resource type="Resource" format=3]
+
+[resource]
+name = "${exportName}"
+layers = [
+${visibleLayers.map(layer => `  {
+    "id": "${layer.id}",
+    "name": "${layer.name}",
+    "position": Vector2(${layer.position.x}, ${layer.position.y}),
+    "size": Vector2(${layer.width}, ${layer.height}),
+    "z_index": ${layer.position.zIndex},
+    "opacity": ${layer.opacity},
+    "visible": ${layer.visible},
+    "is_base": ${layer.isBase}
+  }`).join(',\n')}
+]
+canvas_size = Vector2(${exportWidth}, ${exportHeight})
+export_name = "${exportName}"
+`
+          internalExportHandler('godot', godotData)
+          break
+        }
+      }
+    } else {
+      // Use external handler
+      switch (format) {
+        case 'png':
+          exportToPNG()
+          break
+        case 'json':
+          exportToJSON()
+          break
+        case 'godot':
+          exportToGodot()
+          break
+      }
+    }
+  }, [exportName, exportToPNG, exportToJSON, exportToGodot, onExport, downloadFile, visibleLayers, exportWidth, exportHeight])
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-800">Export Character</h3>
+    <div className={styles.container()}>
+      <h2 className={styles.title()}>Export Character</h2>
       
-      {!hasLayers ? (
-        <p className="text-sm text-gray-500">Upload layers to enable export options</p>
-      ) : (
-        <div className="space-y-3">
-          <p className="text-sm text-gray-600">
-            Export your character with {allLayers.length} layer{allLayers.length !== 1 ? 's' : ''}
-          </p>
-          
-          <div className="grid grid-cols-1 gap-2">
-            <button
-              onClick={exportToPNG}
-              className={exportButton({ variant: 'primary', disabled: !hasLayers })}
-              disabled={!hasLayers}
-            >
-              <span>📷</span>
-              <span>Export as PNG</span>
-            </button>
-            
-            <button
-              onClick={exportToJSON}
-              className={exportButton({ variant: 'secondary', disabled: !hasLayers })}
-              disabled={!hasLayers}
-            >
-              <span>📄</span>
-              <span>Export Layer Data (JSON)</span>
-            </button>
-            
-            <button
-              onClick={exportToGodot}
-              className={exportButton({ variant: 'success', disabled: !hasLayers })}
-              disabled={!hasLayers}
-            >
-              <span>🎮</span>
-              <span>Export for Godot (.tres)</span>
-            </button>
+      <div className={styles.section()}>
+        <h3 className={styles.sectionTitle()}>Export Configuration</h3>
+        <div className={styles.exportConfig()}>
+          <div className={styles.configRow()}>
+            <label className={styles.configLabel()}>Name:</label>
+            <input
+              type="text"
+              value={exportName}
+              onChange={(e) => {
+                const newName = e.target.value
+                setExportName(newName)
+                onConfigChange?.({ width: exportWidth, height: exportHeight, name: newName })
+              }}
+              className={styles.configInput()}
+              placeholder="character"
+            />
           </div>
-          
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>• PNG: Flattened image ready for use</p>
-            <p>• JSON: Layer data without images (for backup)</p>
-            <p>• Godot: Resource file with layer positioning data</p>
+          <div className={styles.configRow()}>
+            <label className={styles.configLabel()}>Width:</label>
+            <input
+              type="number"
+              value={exportWidth}
+              onChange={(e) => {
+                const newWidth = Number(e.target.value)
+                setExportWidth(newWidth)
+                onConfigChange?.({ width: newWidth, height: exportHeight, name: exportName })
+              }}
+              className={styles.configInput()}
+              min="1"
+            />
+          </div>
+          <div className={styles.configRow()}>
+            <label className={styles.configLabel()}>Height:</label>
+            <input
+              type="number"
+              value={exportHeight}
+              onChange={(e) => {
+                const newHeight = Number(e.target.value)
+                setExportHeight(newHeight)
+                onConfigChange?.({ width: exportWidth, height: newHeight, name: exportName })
+              }}
+              className={styles.configInput()}
+              min="1"
+            />
           </div>
         </div>
-      )}
+      </div>
+
+      <div className={styles.section()}>
+        <h3 className={styles.sectionTitle()}>Layers to Export ({visibleLayers.length})</h3>
+        <div className={styles.layerPreview()}>
+          {baseLayers.map(layer => (
+            <div key={layer.id} className={styles.layerItem()}>
+              <div className={`${styles.layerIndicator()} ${styles.baseIndicator()}`} />
+              <span className={styles.layerName()}>{layer.name} (Base)</span>
+            </div>
+          ))}
+          {additionalLayers
+            .sort((a, b) => b.position.zIndex - a.position.zIndex)
+            .map(layer => (
+              <div key={layer.id} className={styles.layerItem()}>
+                <div className={`${styles.layerIndicator()} ${styles.additionalIndicator()}`} />
+                <span className={styles.layerName()}>{layer.name}</span>
+              </div>
+            ))}
+        </div>
+      </div>
+
+      <div className={styles.section()}>
+        <h3 className={styles.sectionTitle()}>Export Formats</h3>
+        <div className={styles.buttonGroup()}>
+          <button
+            onClick={() => handleExport('png')}
+            disabled={visibleLayers.length === 0}
+            className={`${styles.button()} ${styles.primaryButton()}`}
+          >
+            Export PNG
+          </button>
+          <button
+            onClick={() => handleExport('json')}
+            disabled={visibleLayers.length === 0}
+            className={`${styles.button()} ${styles.secondaryButton()}`}
+          >
+            Export JSON
+          </button>
+          <button
+            onClick={() => handleExport('godot')}
+            disabled={visibleLayers.length === 0}
+            className={`${styles.button()} ${styles.secondaryButton()}`}
+          >
+            Export Godot (.tres)
+          </button>
+        </div>
+      </div>
     </div>
   )
-} 
+}
+
+export default UploadExportPanel 
